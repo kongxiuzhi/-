@@ -1,0 +1,17 @@
+1.python
+    python3 python2.7
+
+2.数据库
+    mysql mongodb postgresql
+
+3.web框架
+    django tornado flask
+
+4.http tcp/ip协议
+
+5.javascript
+    jquery ajax
+
+6.操作系统，数据结构
+
+7.linux

@@ -1,0 +1,260 @@
+数据库
+    1.组织和存储数据的功能
+    2.提供高效获取和处理数据的功能
+    数据的电子柜
+
+    数据库分类
+
+        NoSql 非关系数据库的统称
+        对象关系数据库 postgresql
+        关系型数据库
+    E-R模型图 实体关系模型图
+
+python 链接数据库 API 2.0
+    链接对象
+        1.connect() 函数成功链接后返回的链接对象
+        2.链接对象的方法
+            1.cursor() 返回操作数据库的游标
+            2.commit() 提交事务
+            3.rollback() 事务回滚
+            4.close() 关闭链接
+    游标对象
+        1.调用链接对象的游标方法cursor()返回游标对象
+        2.游标对象的方法
+            1.callproc(pname,[,pname])调用存储过程
+            2.execute(sqlstr,[,params])执行SQL查询语句
+            3.executemany(sqlstr,seq-params)以序列中的参数执行多次查询
+            4.fetchone()获取查询结果中的一个数据行
+            5.fetchmany(size)查询指定数量的数据行
+            6.fetchall() 获取所有查询结果
+            7.nextset() 获取所有查询结果集当前结果集的下一个结果集
+            8.可迭代获取结果
+        3.属性
+            arraysize  
+            setinputsize
+            setouputsize
+    操作异常
+        StandarError
+            1.Warning
+            2.Error
+                1.InterfaceError
+                2.DataBaseError
+    参数形式
+        1.SQL查询语句中的使用参数时站位符的形式
+        2.由模块级变量paramstyle的值指定
+        3.qmark:(?)
+        4.numeric:(:1)
+        5.named:(:name)
+        6.format:(%s)
+        7.pyformat:(%(name)s)
+
+sqlite3模块的使用步骤
+    关系模型数据库，不需要安装、配置、启动，依赖于文件系统，不需要部署，支持事务
+    1.导入sqlite3模块 from sqlite3 import connect
+    2.链接数据库
+        sqlite3.connect("路径/名称.db")
+        sqlite3.connect(":memory:")#内存中创建临时数据库
+        以上返回数据库链接对象
+    3.获取游标对象
+        cur = 数据库对象.cursor()
+    4.游标的方法
+        cur.execute()
+        cur.executemany()
+        cur.executescript()
+        cur.fetchone()
+        cur.fetchall()
+        cur.fetchmany()
+    5.提交事务
+        con.commit()
+        con.rollback()
+    6.关闭链接
+        con.close()
+    高级
+        行对象（Row）
+            游标建立前 执行 conn.row_factory = sqlite3.Row
+            row = cur.execute('select * from mytable').fetchone
+        executemany()
+            rows=[(),()]
+            cur.executemany('insert into mytable () values (?,?,?)',rows)#sqlite3 以“？” 作为占位符
+        executescript()
+            sql_str = """
+                create table test(id integer,name text);
+                insert into test (id,name) values (1,"Lily");
+                insert into test (id,name) values (2,"Green");
+            """
+            cur.executescript(sql_str)
+        创建自定义函数
+            con.create_function("注册后的名字",参数数量,python函数)
+            con.create_aggregate()
+        数据类型
+            NULL integer text blob
+MariaDB数据库
+    c/s模式，Mysql的一个分支，有丰富的接口，使用标准的SQL
+    1.安装
+        yum install mariadb*
+        systemctl start mariadb.service
+        systemctl enable mariadb.service
+        mysql_secure_installation
+    2.python链接mysql的第三方库
+        1.pymysql 
+        2.mysql connect python
+    3.链接
+        connect(host,user,password,port,dbname)
+        例如
+            from pymysql import connect
+            db_name={
+                'host':'localhost',
+                'user':'root',
+                'password':'123456',
+                'database':'test',
+                'port':3306,
+                'use_unicode':True,
+                'charset':'utf8'
+            }
+            con = connect(**db_name)
+            cur = con.cursor()
+            cur.execute("create table xiyouji(id int(4),name varchar(20),age int(2),address text)")
+            con.commit()
+            con.close()
+
+SQLAlchemy
+    ORM提高开发效率
+    pip install SQLAlchemy
+    1.使用步骤
+        1.构造声明基类
+            Base = sqlalchemy.ext.declaractive.declarative_base()
+        2.声明对象关系映射类
+            继承(Base)
+        3.创建与数据库的链接：
+            engine = sqlalchemy.create_engine(数据库链接字符串)
+        4.创建表
+            Base.metadata.create_all(engine)
+        5.使用会话访问数据库
+            1.创建会话
+                1.Session = sqlalchemy.orm.sessionmaker(bind=engine)
+                    或后配置engine:Session.configure(bind=engine)
+                2.session = Session()
+            2.会话方法
+                1.session.add()
+                2.session.add_all()
+                3.session.query()
+                    filter_by()/filter()
+                    order_by()
+                    first()
+                    all()
+                    [1:3]切片
+                4.session.delete()
+                5.session.commit()
+            3.定义实例
+                定义主键
+                    primary_key = True
+                定义列
+                    Column 构造列对象
+                        Integer,Float,Date,Boolean,...
+            例子
+                from sqlalchemy import create_engine,String,Integer,Column,ForeignKey
+                from sqlalchemy.ext.declarative import declarative_base
+                from sqlalchemy.orm import sessionmaker,relationship
+
+                db_name = "mysql+pymysql://root:ASas1.123@localhost/test?charset=utf8"
+                Base = declarative_base()
+
+                class User(Base):
+                    __tablename__ = 'user'
+                    id = Column(Integer,primary_key=True)
+                    name = Column(String(50))
+                    addresses = relationship("Address",backref='itsuser')
+
+                class Address(Base):
+                    __tablename__ = "address"
+                    id = Column(Integer,primary_key=True)
+                    uid = Column(Integer,ForeignKey('user.id'))
+
+                engine = create_engine(db_name)
+                Base.metadata.create_all(engine)
+
+                Session = sessionmaker(bind=engine)
+                session = Session()
+                
+                运行后
+                    u = User()
+                    u.id = 1
+                    u.name = u"孙悟空"
+                    session.add(u)
+                    session.commit()
+
+                    u2 = User(id=2,name=u"猪八戒")
+                    session.add(u)
+                    session.commit()
+
+                    u3 = session.query(User).filter_by(id==2).first()
+                    u3.id -> 2
+                    u3.name -> 猪八戒
+
+Mongodb
+    非关系数据库，服务器可以集群以平衡数据库压力，支持高并发读写和海量读写，列没有固定字段
+    存储模式
+        1.集合（关系数据库的表）
+        2.文档（关系数据库的记录）
+            同一集合中的文档结构模式与数据类型可以不同  
+
+
+
+    通用示例：
+    db_set.py
+        from sqlite3 import connect #修改数据库名字切换数据库
+
+        db_name = ":memory:"#内存中创建
+
+    db_api.py
+        from db_set import *
+        sql_string_dict = {
+            "create":'create table general_tab (card_id integer,name text,address text)',    
+            "insert":[
+                'insert into general_tab (card_id,name,address) values (1,"LiMing","Ease Zone")',
+                'insert into general_tab (card_id,name,address) values (2,"WangMing","West Zone")',
+                'insert into general_tab (card_id,name,address) values (3,"ZhaoMing","South Zone")',
+                'insert into general_tab (card_id,name,address) values (3,"DingMing","North Zone")',
+            ],    
+            "select":'select * from general_tab',    
+            "update":'update general_tab set name="QianMing" where card_id=4',
+            "delete":'delete from general_tab where card_id =3',
+        }
+
+        con = connect(db_name)#slqlite3 不需要提供其他信息
+        cur = con.cursor()
+
+        print("Create Table:\n ")
+        cur.execute(sql_string_dict['create'])
+
+        print("Insert Data:\n")
+        
+        for sql in sql_string_dict['insert']:
+            cur.execute(sql)
+        print("end!")
+
+        print("All records:")
+        cur.execute(sql_string_dict['select'])
+        for row in cur:
+            print(row)
+
+        cur.execute(sql_string_dict['update'])
+
+        print("After update")
+
+        print("All records:")
+        cur.execute(sql_string_dict['select'])
+        for row in cur:
+            print(row)
+        
+        cur.execute(sql_string_dict['delete'])
+
+        print("After delete")
+        print("All records:")
+
+        cur.execute(sql_string_dict['select'])
+        for row in cur:
+            print(row)
+    
+        con.commit()
+        con.close()

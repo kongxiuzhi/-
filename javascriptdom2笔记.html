@@ -1,0 +1,94 @@
+第一章：javascript简介
+	ECMAScript3.0 ECMAScript3.0 
+第二章 语法
+	1.添加javascript代码到HTML
+		<script src="js/script.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var num1=1;
+			if(){
+				
+			}else{}
+			for(var i=0;i<100;i++){}
+			while(){}
+		</script>
+	2.语法
+		以“；”结尾，注释“/*...*/”,"//"
+		匿名函数
+			(function(){})()
+第三章 DOM
+	D:document,O:object对象包括：用户定义的对象，内建对象，宿主对象，M：model或地图
+	一份文档就是一个节点树，节点：元素节点，属性节点，文本节点，每个节点都是一个对象。
+	获取元素：
+		1.var item = document.getElementById("eleid");
+		2.var items = document.getElementsByTagName("*");//返回所有元素节点的数组
+			var nums = items.length;var elem1 = items[0];
+		3.var items = document.getElementByClassName("eleclass");//
+	设置属性：
+		object.getAttribute(attribute);
+		var paras = document.getElementsByTagName("p");
+		var pa0 = paras[0].getAttribute("title");
+		object.setAttribute(attribute,value);
+		pa0.setAttribute("title","the first para");
+
+第四章 事件处理函数
+	添加事件处理函数的语法
+		event = "javascript statement(s)";
+		<a href="#" onclick="myfunc();return false;">example</a>
+	childNodes属性
+		var chnos = bodyElement.childNodes;//bodyElement所有的子节点 
+	nodeType属性
+		1 元素节点，2 属性节点，3 文本节点
+	nodeValue属性
+		var evalue = node.nodeValue;//获取节点的值
+		node.nodeValue = "the node value";//设置节点的值
+	定位元素
+		nodes.childNodes[0],nodes.firstChild,nodes.lastChild,nodes[nodes.childNodes.length-1]
+	javascript:伪协议
+		<a href="javascript:statement(s);"></a>
+
+第5章 动态创建节点
+	createElement,createTextNode,appendChild,insertBefore,nextSibling,firstChild,lastChild
+	var para = document.createElement("p");
+	var text = document.createTextNode(" this is a text node");
+	para.appendChild(text);
+	tagparentnode.insertBefore(newnode,tagnode);
+	
+	ajax
+		1.open(),send(),XMLHttpRequest,onreadystatechange,readyState,responseText,responseXML
+		第一步：初始化XMLHttpRequest对象
+			var request = XMLHttpResquest();
+		第二步：设置open(method,url,异步是否等待响应);
+			request.open('GET','example.txt',true);
+		第三步：send();
+			send(null)或send(str);//post方法send数据
+		 
+
+函数
+	1.window.open(url,name,features);//url:要打开的地址；name:新窗口的名字，相互通信使用；features：新窗口的特性；
+	function popUp(winURL){	
+		window.open(winURL,"popUp","width=320,heigh=480");
+	}
+	2.function addLoadEvent(func){
+		var oldonload = window.onload;
+		if(typeof window.onload != "function"){
+			window.onload = func; 		
+		}else{
+			window.onload=function(){
+				oldonload();
+				func();
+			}		
+		}
+	}
+	3 function insertAfter(newElement,tagElement){
+			var parent = tagElement.parentNode;
+			if(parend.lastNode == tagElement){
+				parent.appendChild(newElement);
+				}else{
+					parent.insertBefore(newElement,tagElement.nextSibling);	
+					}	
+		}
+	
+
+
+
+

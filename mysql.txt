@@ -1,0 +1,187 @@
+登陆和推出MYSQL
+    mysql -h hostname|hostIP -P port -u username -p Databasename -e "sql 语句"
+
+数据库存储引擎
+    存储引擎就是指表的类型，决定了表在计算机中的存储方式
+    show engines;
+    show variables like "storage_engine";
+创建数据库
+    数据表的仓库
+    create database databasename;
+    show databases;
+    drop database databasename;
+创建表
+    表是数据库存储数据的基本单位，一个表包含若干字段或记录。
+    create table tablename (
+    子段名 子段类型 [完整性约束]，
+    子段名 子段类型 [完整性约束]，
+    )engine=InnoDB default charaset=utf8
+    子段类型：
+        整型：tinyint smallint mediumint int integer bigint
+        浮点和定点：float double decimal(M,D)#M总长度，D 小数点后长度
+        字符：char varchar timytext text mediumtext longtext menu set
+        二进制类型：binary(M)【定长字节数为M】 varbinary(M)[变长字节数小于M+1]
+                    bit(M)[M位二进制] tinyblob blob mediumblog longblob
+        日期和时间：YEAR DATE TIME DATETIME TIMESTAMP
+        布尔：boolean==tinyint(1)
+    完整性约束条件：
+        primary key ,not null,nuique,auto_increment,foreign key,default
+        
+        创建主键方式
+            create table example1(id int primary key auto_increment,name varchar(20));
+            or
+            create table example2(id int auto_increment,stu_num int not null,name varchar(20),primary key(id,stu_num));
+        创建外键
+            constraint 外键名 foreign key (子段1，子段2...) references 表名(字段a,字段b.....);
+            create table example3(id int,stu_num int,stu_grade varchar(3),constraint stfk foreign key(id,stu_num) references example2(id,stu_num));
+    查看表结构
+        describe 表名；
+        show create table 表名；
+    修改表
+        alter table 表名 [rename|drop|change|add|modify] 字段
+        修改表名
+            alter table 表名 rename 新表名；
+            alter table example1 rename example1new;
+        新增字段
+            alter table 表名 add 字段名 type [完整性约束条件]；
+            alter table teacher add address varchar(100) [first|alter 字段名];
+        删除字段
+            alter table 表名 drop 字段名；
+            alter table teacher drop address;
+        更改字段名
+            alter table 表名 change 旧字段名，新字段名 type [完整性约束条件];
+            alter table teacher change num tea_id int(4) auto_increment;
+        修改字读类型或约束条件或字段的位置
+            alter table 表名 modify 字段名 新的类型 新的约束条件；
+            alter table teacher modify name varchar(30) not null [first|after 字段名];
+        删除表的外键依赖
+            alter table 表名 drop foreign key 外键名；
+            
+创建索引
+    索引是创建在表上的，是对数据库表中一列或多列的值进行排序的一种结构。索引可以提高查询速度。
+    1.create table 表名(字段1,字段2....,[FULLTEXT|UNIQUE|SPATIAL] index [索引名](字段1，字段2，....));
+    2.create [fulltext|unique|spatial] index 索引名 on 表名(字段1，字段2,....);
+    3.alter table 表名 add [fulltext|unique|spatial] index 索引名 (字段1，字段2,....)
+    4.drop index 索引名 on 表名；
+
+创建视图
+    create [algorithm={undefine|merge|temptalbe}] view 视图名 [视图字段名列表] as select 字段1，字段2，... from 表名 [with [cascaded|local] check option];
+    查看视图信息
+        describe|desc 视图名;
+        show create view 视图名;
+        show table status like 视图名；
+    查看视图中的信息
+        select * from 视图名；
+    修改视图
+        create or replace [algorithm={undefine|merge|temptable}] view 视图名 [(字段清单)] as select 语句 [with ..]
+        alter ....
+    更新视图
+        update 视图名 set 字段1=..;
+    删除视图
+        drop view 视图名;
+创建触发器
+    create trigger 触发器名 before|after 触发事件{例如insert|update|drop} on 表名 for each row 执行语句；
+    创建多个执行语句的触发器
+        DELIMITER &&
+        CREATE .... FOR EACH ROW
+        BEGIN
+            执行语句1；
+            执行语句2；
+        END
+        &&
+        DELIMITER;
+    查看触发器信息
+        show triggers;
+        select * from information_schema.triggers;
+        select * from information_schema.triggers where trigger_name=触发器名;
+    删除触发器
+        drop trigger 触发器名；
+基本查询语句
+    select 属性列表
+        from 表名和视图列表
+        [where 条件表达式]
+        [group by 属性名1 [HAVING 条件表达式2]] sum(),count(),max(),min(),avg()
+        [ORDER BY 属性名2 [asc|desc]]
+    单表查询
+        查询所有字段 select * from 表名;
+        查询制定字段 select 字段1，字段2 from 表明;
+        查询制定记录 select * from 表名 where 条件;
+            查询条件 = <> <=> <= >= != !< !>
+            指定范围 between and,not between and
+                SELECT * FROM 表名 WHERE 字段名 BETWEEN 值1 AND 值2;
+            指定集和 IN，NOT IN
+                select * from 表名 where 字段名 in (值1，值2，值3);
+            匹配字符 like,not like [%任意多个 _]
+                SELECT * FROM employee WHERE name LIKE "aric";通配符 % _
+            or and 
+            any all existe
+
+        查询结果不重负
+            select distinct 字段名 from 表名;
+        对查询结果排序
+            order by 字段名 [asc|desc];
+            SELECT * FROM employee order by age;
+        分组查询
+            group by 字段名 [HAVING 条件表达式][with rollup]
+            可以和group_concat()函数一起使用
+            count(),avg(),max(),min(),sum()
+            例子：
+                select * from employee;
+                select * from employee group by sex;
+            匹配空值 is null,is not null
+            多个查询条件 and,or
+        用LIMIT限制查询结果的数量
+            LIMIT（开始，数量）；
+    内连接查询
+        SELECT num,name,employee.d_id,age,sex,d_name
+        FROM employee,dapartment WHERE employee.d_id=department.d_id;
+    外连接查询 
+        select 字段表列表
+            from 表1 LEFT|RITHT JOIN 表2
+            on 表1.字段1 = 表2.字段2;
+    为表取别名
+        表名 表的别名
+    字段取别名
+        字段名 as 字段别名
+    select * from info where name regexp '';
+
+插入数据
+    insert into 表名 [(字段...)] values (值1,....);
+    insert into 表名 [(字段...)] select 字段1，字段2，... from 表名 where 条件表达式;
+更新数据
+    update 表名 set 字段名1=值1，字段名2=值2,... where 条件表达式;
+删除数据
+    delete from 表名 [where 条件表达式];
+
+Mysql 运算符
+    算术运算符
+        + - * / DIV % MOD； MOD(x1,x2);
+    比较运算符
+        = <> != <=> > >= < <= ,is null,is not null,between and,in,like,regexp
+    逻辑运算符
+        && and || or
+        & | ~
+mysql 函数
+数学函数
+    ABS() CEIL() CEILING() FLOOR() RAND() RAND(X)【X相同则产生的随即数相同】 SING(X) PI() TRUNCATE(X,Y)
+    ROUND(X) ROUND(X,Y) POW(X,Y) POWER(X,Y) SQRT(X) EXP(X) MOD(X,Y) LOG(X) LOG10(X) RADIANS(X) DEGREES(X)
+    SIN(X) ASIN(X) COS(X) ACOS(X) TAN(X) TAN(X) ATAN(X) ATAN2(X,Y) COT(X)
+
+字符串函数
+
+    char_length(s) length(s) concat(s1,s2,...) cancat_ws(x,s1,s2,...) insert(s1,x,len,s2) upper(s),ucase(s)
+    lower(s),lcase(s) left(s,n) right(s,n) lpad(s1,len,s2) rpad(s1,len,s2) ltrim(s) rtrim(s) trim(s) trim(s1 from s)
+    repeat(s,n) space(n) replace(s,s1,s2) strcmp(s1,s2) substring(s,n,len) mid(s,n,len) locate(s1,s),position(s1 in s)
+    instr(s,s1) reverse(s) elt(n,s1,s2,...) export_set(x,s1,s2) field(s,s1,s2,...) find_in_set(s1,s2) make_set(x,s1,s2,...)
+日期和时间函数
+    curdate(),current_date(),curtime(),current_time(),now(),current_timestamp(),
+    localtime(),sysdate(),localtimestamp(),unix_timestamp(),unix_timestamp(d)
+    from_unixtime(d) utc_date() ut_time() month(d) monthname(d) dayname(d) dayofweek(d)
+    weekday(d) week(d) weekofyear(d) dayofyear(d) dayofmonth(d) year(d) quarter(d)
+    hour(t) minute(t) second(t) extract(type from d) ,time to sec(t),sec_to_time(s),
+    to_days(d),from_days(n),datediff(d1,d2),adddate(d,n),subdate(d,n)
+version() connection_id() database(),schema(),user(),
+
+hex(),oct(),bin(),conv(x,f1,f2)
+
+    

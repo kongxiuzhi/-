@@ -1,0 +1,19 @@
+css伪元素
+	CSS ::first-line 伪元素 <!--定义在一个元素的内容第一行上插入样式  -->
+	CSS ::first-letter 伪元素 <!--定义在一个元素的内容第一个letter上插入样式  -->
+	CSS ::before 伪元素 <!--定义在一个元素的内容之前插入content属性定义的内容与样式  -->
+	CSS ::after 伪元素 <!--定义在一个元素的内容之后插入content属性定义的内容与样式  -->
+	CSS ::selection 伪元素 <!--定义在鼠标选中元素上插入样式  -->
+	
+	例子：
+		p::after
+			{
+				content:"hello world";
+				background:lightgreen;		
+				}
+
+HTML5 data-* 自定义属性
+	<div id="test" data-age="24">
+		click here
+	</div>
+	test.dataset.my="Byron";

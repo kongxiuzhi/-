@@ -1,0 +1,127 @@
+正确的配置apache && django && mod_wsgi
+    1.python源码安装 ./configure --enable-shared #和mod_wsgi有关
+    2.apache 安装
+    3.mod_wsgi源码安装 --with-pyhon=/usr/local/bin/python3 #指定python版本
+    4.vim /etc/selinux/config
+        修改SELINUX=disabled
+        重起后生效！
+        重起后生效！
+    5.配置apache
+       1.在httpd.conf添加LoadModule wsgi_module modules/mod_wsgi.so 
+        #否则无法加载wsgi报错，mod_wsgi.so 被mod_wsgi安装在modules中了
+       2.编写wsgi配置文件
+            创建django.conf文件添加如下代码
+            
+            #自己网站要监听的端口，根据IP 端口 ServerName|ServerNameAlias 确定网站app
+            Listen 8080
+            #监听本主机所有ip地址的8080端口
+            <VirtualHost *:8080>
+            #IP:端口相同 服务器名不同，这个虚拟机监听 *：8080:www.blog.com
+            ServerName www.blog.com
+            #指定守护进程的名字和虚拟环境下使用python的路径和工程目录
+            WSGIDaemonProcess  blog python-path=/home/myven/dgp:/home/myven/lib/python3.6/site-packages
+            #指定进程组名
+            WSGIProcessGroup blog
+            #指定django真实的wsgi的位置
+            WSGIScriptAlias / /home/myven/dgp/blog/blog/wsgi.py
+            Alias /static/ /home/myven/dgp/blog/static/
+            Alias /media/ /home/myven/dgp/blog/media/
+            <Directory /home/myven/dgp/blog/static>
+            Require all granted
+            </Directory>
+            <Directory /home/myven/dgp/blog/media>
+            Require all granted
+            </Directory>
+            <Directory /home/myven/dgp/blog/blog>
+            <Files wsgi.py>
+            Require all granted
+            </Files>
+            </Directory>
+            </VirtualHost>
+    6.配置django
+        1.settings.py
+            ALLOWED_HOSTS = ["*"]#所有地址
+
+            STATIC_URL = '/static/'
+            STATIC_ROOT = os.path.join(BASE_DIR,"static/")
+            #运行 python manage.py collectstatic 收集adminset的静态文件
+
+            MEDIA_URL = '/media/'
+            MEDIA_ROOT = os.path.join(BASE_DIR,"media/")
+        2.wsgi.py
+            添加
+            import sys
+            form os.path import join,dirname,abspath
+            PROJECT_DIR = dirname(dirname(abspath(__file__)))
+            sys.path.insert(0,PROJECT_DIR)#否则会报错
+    7.centos7 apache 权限管理
+        chmod -R 755 myproject
+        chmod -R 775 media/uploads#上全文件的文件夹
+
+1.python 安装
+    ./configure --enable-shared --prefix=/usr/local/python3
+
+    error:
+        python3.6: error while loading shared libraries: 
+        libpython3.6m.so.1.0: cannot open shared object file:
+        No such file or directory
+    solution:
+        #echo "/usr/local/python3/lib" > /etc/ld.so.conf.d/python3.6.conf
+        #ldconfig
+        或者没有指定prefix目录 
+        #echo "/usr/local/lib" > /etc/ld.so.conf.d/python3.6.conf
+        #ldconfig
+2.安装mod_wsgi
+    error
+        mod_wsgi的版本对应不同的python版本
+    solution
+        1.下载mod_wsgi源码包
+        2.tar -zxvf mod_wsgi.x.x.tar.gz
+        3.编译安装 
+            ./configure --help
+            ./configure --with-python=/usr/local/bin/python3 #要使用的python版本
+            make && make install
+        注：mod_wsgi.so 自动安装到httpd/moduls中了
+            配置apache时使用
+
+        在虚拟环境中安装mod_wsgi
+        1.安装python3
+            ./configure --enable-shared
+        2.按装virtualenv
+            pip3 install virtualenv
+        3.创建虚拟环境
+            virtualenv -p [python2|python3] myvenname
+        4.激活虚拟环境
+            source myvenname/bin/activate 
+            推出
+                deactivate
+        5.安装mod_wsgi
+            pip install mod_wsgi
+        原因
+            mod_wsgi.so  ?
+3.安装配置apache && 配置mod_wsgi
+    安装apache
+    systemctl start httpd
+    systemctl enable httpd
+
+    主配置文件/etc/httpd/conf/httpd.conf
+    加载的个人配置文件目录/etc/httpd/conf.d/myhttpd.conf
+
+    error
+        在使用虚拟环境的工程中，设置wsgi配置中别名和文件权限时路径不完整，没有
+        把虚拟环境的文件路径包含进去 
+        例如：
+            WSGIDaemonProcess  blog python-path=/home/myven/dgp:/home/myven/lib/python3.6/site-packages
+            /home/:主目录
+            myven/:虚拟环境目录
+            dgp/:虚拟环境下自定义的文件夹，里面包含着工程文件
+
+  
+
+
+
+sys.path.insert()
+755 root:root
+775 上传文件权限 
+    myproject/media/uploads
+    chmod -R 775 uploads

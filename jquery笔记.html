@@ -1,0 +1,213 @@
+1.jQuery引用
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    $ = jquery
+    $(document).ready(function(){}) 可以简写成 $(function(){}) 类似于 window.onload = function(){}
+2.jQuery选择器
+    1.基本选择器
+       $("#idName") 根据给定的ID匹配一个元素
+       $(".clsName") 根据给定的类匹配所有的元素
+       $("*") 匹配所有元素
+       $(element) 匹配 p body 等元素
+       $(selector1,selector2,...) 将匹配到到的元素合并后一起返回
+    2.层次选择器
+       $("ancestor descendant") 根据祖先元素匹配所有后代元素 
+       $("parent > child") 根据父元素匹配所有的子元素 直接子元素
+       $("pre + next") 匹配所有紧接在pre元素后的相邻元素prev.next()
+       $("prev~sibling") 匹配prev元素之后的所有兄弟元素 prev.nextAll()
+    3.过滤选择器
+        简单过滤选择器，以冒号（：）开头；
+        1.first() :first
+        2.last() :last
+        3. :not(selector)
+        4. :even :odd :eq() :gt() :lt() 在父元素中的索引值；$("li:eq(1)") 索引的值为1的元素
+        5. :header 获取所有标题元素 h1,h2,h3...
+        6. :animated 获取正在执行动画效果的元素
+        内容过滤选择器
+            :contains(text) 获取包含给定文本的元素 $("div:contains("hello world")")
+            :empty 获取所有不包含子元素或者文本的空元素
+            :has(selector) 获取含有指定元素的元素 $("div:has(span)")
+            :parent 获取含有子元素和文本的元素
+        可见性过滤选择器
+            :hidden 获取所有不可见元素，或着type为hidden的元素
+            :visible 获取所有可见的元素 
+        属性过滤选择器
+            [attribute] 获取包含给定属性的元素 $("div[id]")
+            [attribute=value] 获取等于给定的属性是某特定值的元素$("div[title='a']")
+            [attribute!=value]
+            [attribute^=value]
+            [attribute$=value]
+            [attribute*=value] 获取元素包含特定值的元素 $("div[title*='b']")
+            [attribute]
+        子元素过滤器
+            :nth-child(eq|even|odd|index)
+            :first-child
+            :last-child
+            :only-child
+        表单对象属性过滤选择器
+            :enabled  获取表单中所有属性为可用的元素 $("#form1 input:enabled")
+            :disabled
+            :checked
+            :selected $("selecte option:selected")
+
+
+
+    4.表单选择器
+        :input
+        :text
+        :password
+        :radio
+        :checkbox
+        :submit
+        :image
+        :reset
+        :button
+        :file
+
+3. jQuery 操作DOM
+    DOM 文档对像模型，为文档提供了一种结构化表示方法，通过该方法可以改变文档的内容和
+    展示形式。主要包括对元素属性，内容，值，css的操作。
+    1.元素属性操作
+        attr()
+        获取元素属性的语法格式如下
+        attr(attrName) 例子：$("img").attr("title")
+        设置属性语法格式如下
+        attr(key,value) 或 attr({"key1":"value1","key2":"value2"})
+        $("img").attr({"src":"Images/img02.jpg","title":"这是一幅画"})
+
+        attr(key,function(index)) //index是但前元素的索引号，返回一个字符串作为元素
+        属性的值
+
+        removeAttr(name) 删除元素某个属性值，name为属性名 
+           
+    2.元素内容操作
+        操作元素内容的方法包括html()和text().类似与JavaScripte中的innerHTML和innerText
+
+        html() 获取元素的HTML内容 html(val)用于设置元素的HTML内容
+        text() 获取元素的文本内容 text(val)用于设置元素的文本内容
+
+    3.获取或设置元素值
+        val(val) 如果不带参数val，则是获取某元素的值；反之，则是将参数val的值赋给某个
+        元素，该方法常用于表单中获取或设置对象的值。
+    
+    4.设置元素样式
+        包括：直接设置样式，增加CSS类别、类别切换、删除类别
+        1.直接设置样式 css(name,value)
+        2.增加CSS类别 addClass(class0 class1 ...) //用空格分割
+            注意：addClass（）方法仅是追加样式类别，不是替换。
+        3.类别切换
+            toggleClass(class) //添加和去除样式
+        4.移除类别removeClass([class1 class2 ...]) 
+            与addClass()方法向对应，移除全部样式或部分样式类别
+            例子 $("p").removeClass(cls0 cls1)
+                 $("p").removeClass()//移除全部样式类别
+    5.创建节点元素
+        $(html) 用于动态创建页面元素，html为创建DOM元素的HTML标记字符串。
+        例子：创建一个div元素节点
+            var $div = $("<div title="创建DIV元素节点">write less do more</div>");
+            $("body").append($div)
+        
+        参考javascripte createElement("p") createTextNode("content")
+        
+    6.内部插入节点
+        append(content) 追加内容到目标元素内部
+            $("body").append($div)；
+        append(function(index,html))
+        appendTo(content) 把所选择的元素追加到另一个指定的元素集合中
+            例子 $("span").appendTo($("div"));把span插入到div中
+        prepend(content) 向目标元素内部前置内容，与append向对应
+        prepend(function(index,html))
+        prependTo(content)
+    7.外部插入内容
+        after(content)
+        after(function)
+        before(content)
+        before(function)
+        insertAfter(content)
+        insertBefore(content)
+    8.复制节点
+        clone() 复制不带任何事件处理的节点，如果要复制所有行为clone(true)
+    9.替换节点
+        replaceWith(content) 将所有选择的元素替换成指定的HTML或DOM元素
+        repleceAll(selector) 替换所有selector元素
+
+    10.包裹节点
+        wrap() 
+            例子 $("p").wrap("<b></b>") //所有的p元素加粗
+            <b><p></p></b>
+        wrapInner()
+            例子 $("span").wrapInner("<i></i>")//所有的span内部文本斜体
+            <span><i></i><span>
+        wrap(html) wrap(element) wrap(fn) unwrap() wrapAll(html) wrapAll(elem)
+        wrapInner(html) wrapInner(element) wrapInner(fn)
+        
+    11.遍历元素
+        each(function(index))//index 为元素的索引 从0开始
+            例子：$("img").each(function(index){})
+        参考 javascripte getElementsByTagName for遍历
+
+    12.删除元素
+        remove()
+            例子
+                $("ul li").remove("li[title='t']");
+                $("ul li:eq(1)").remove();
+        empty()
+
+
+4.jQuery中的事件
+    绑定事件
+        1.$("p").click(function(){});
+        2.$("p")bind("click",[data],function)
+    用bind方法绑定事件 bind(type,[data],fn) type为一个或多个类型的字符串，如"click",
+    也可以是自定义类型；blur focus load resize scroll unload click dblclick mousedown
+    mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit 
+    keydown keypress keyup error
+
+    绑定多个事件
+        1.bind("type1 type2 ...",fn) //多个事件同一个处理函数
+        2.bind({"type1":fn1,type2:fn2,...})//不同事件不同处理函数
+        3.unbind()移除全部事件，
+            unbind(type1,fn1) 移除fn1处理事件
+        注：bind ubind可以处理自定义事件
+    1.切换事件
+        1.hover(fn1,fn2) 鼠标悬停fn1,鼠标移出fn2
+            类似于$("a").hover(fn1,fn2);
+                $("a").mouseenter(fn1);
+                $("a").mouseleave(fu2);
+        ？ 2.toggle(fn1,fn2,fn3,...) 依次循环执行函数序列，每次单击一次触发一次步进一个
+    2.其他事件方法
+        one() trigger()
+        方法one() 绑定一个只触发一次的事件 one(type,[data],fn)
+        方法trigger()是在指定的元素上触发指定类型的事件 trigger(type,[data])
+        
+            
+5.ajax
+    $.get(url,[data],[callback],[type])
+        url等待加载的地址，data发送的数据key/value,callback执行成功时的回调函数
+        type指定返回数据类型 html xml js json
+            xml ?xml version="1.0" encoding="UTF-8"?> <root></root>
+    $.post()
+    $.ajax([option])
+        url string 发送请求的地址
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
