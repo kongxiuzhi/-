@@ -1,0 +1,8 @@
+1.二分法
+	1剩余  hight -low + 1
+	2剩余  (hight -low + 1)/2
+	.
+	.
+	.
+	m剩余 (hight-low+1)/2**m <1
+

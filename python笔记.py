@@ -15,5 +15,26 @@
         getattr(obj1，attr1)#如果对象obj1含有属性attr1则返回attr1的值，否则执行__getattr__方法
         
 
-
-
+3.namespace命名空间
+  例子：
+  	class A:
+  		C = 10
+		def __init__(self,name):
+			self._name = name
+		def print_name(self):
+			print(self._name)
+	class B(A):
+		def __init__(self,name):
+			super().__init__(name)
+		def say_hello(self):
+			print("hello"+self._name)
+	a = A("jone")
+	A:
+	  C print_name
+	B：
+	  say_hello
+	a:
+	  _name
+4.特性和描述符
+	property
+	__set__ __get__ __delete__
